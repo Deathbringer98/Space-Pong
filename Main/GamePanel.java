@@ -1,15 +1,20 @@
-import javax.swing.JPanel;
-import javax.swing.Timer;
-import java.awt.Graphics;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Stroke;
-import java.awt.BasicStroke;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.ActionListener;
+import java.awt.Image;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
     static final int GAME_WIDTH = 800;
@@ -23,31 +28,70 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     Timer timer;
     int player1Score = 0;
     int player2Score = 0;
-    boolean playState = true;  // Flag to check if ball is in play
-    SoundEffect scoreSound;
+    boolean playState = true;
+    private Image backgroundImage;
+    private SoundEffect scoreSound;  // Declaration of the SoundEffect object
 
     public GamePanel() {
+        
         player1 = new Paddle(0, (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2), PADDLE_WIDTH, PADDLE_HEIGHT, 1);
         player2 = new Paddle(GAME_WIDTH - PADDLE_WIDTH, (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2), PADDLE_WIDTH, PADDLE_HEIGHT, 2);
         ball = new Ball((GAME_WIDTH / 2) - (BALL_DIAMETER / 2), (GAME_HEIGHT / 2) - (BALL_DIAMETER / 2), BALL_DIAMETER, BALL_DIAMETER);
+        loadImage();
+        scoreSound = new SoundEffect("/sounds/score.wav");  // Initialize the sound effect
 
         this.setFocusable(true);
         this.addKeyListener(this);
         this.setPreferredSize(new java.awt.Dimension(GAME_WIDTH, GAME_HEIGHT));
-        this.setBackground(Color.BLACK);
-        
         timer = new Timer(10, this);
         timer.start();
-        scoreSound = new SoundEffect("/sounds/score.wav");
     }
+
+    private void loadImage() {
+        String filePath = "C:/Users/jacka/OneDrive/Desktop/Pong/Main/images/br.jpg";
+        File file = new File(filePath);
+        try {
+            backgroundImage = ImageIO.read(file);
+            if (backgroundImage != null) {
+                System.out.println("Image loaded successfully: Width = " + backgroundImage.getWidth(null) + ", Height = " + backgroundImage.getHeight(null));
+            } else {
+                System.err.println("Failed to load the image.");
+            }
+        } catch (IOException e) {
+            System.err.println("Exception while loading the image: " + e.getMessage());
+            System.err.println("Failed to load image from path: " + filePath);
+        }
+    }
+    
+    
+
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        // Draw the background image if it's loaded, otherwise draw a black background
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
+        } else {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, this.getWidth(), this.getHeight());
+        }
+        drawScoreboard(g);
+        drawCenterLine(g);
+        player1.draw(g);
+        player2.draw(g);
+        ball.draw(g);
+    }
+    
     public void scoreUpdate(int player) {
         if (player == 1) {
-            player1Score++;
+            player1Score++;  // Correctly increment player1's score
         } else if (player == 2) {
-            player2Score++;
+            player2Score++;  // Correctly increment player2's score
         }
         scoreSound.play(); // Play sound on scoring
     }
+    
 
     public void actionPerformed(ActionEvent e) {
         if (playState) {
@@ -98,14 +142,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
 
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        drawScoreboard(g);
-        drawCenterLine(g);
-        player1.draw(g);
-        player2.draw(g);
-        ball.draw(g);
-    }
 
     private void drawScoreboard(Graphics g) {
         g.setColor(Color.WHITE);
