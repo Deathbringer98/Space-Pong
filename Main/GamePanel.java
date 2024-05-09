@@ -33,7 +33,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private SoundEffect scoreSound;  // Declaration of the SoundEffect object
 
     public GamePanel() {
-        
         player1 = new Paddle(0, (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2), PADDLE_WIDTH, PADDLE_HEIGHT, 1);
         player2 = new Paddle(GAME_WIDTH - PADDLE_WIDTH, (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2), PADDLE_WIDTH, PADDLE_HEIGHT, 2);
         ball = new Ball((GAME_WIDTH / 2) - (BALL_DIAMETER / 2), (GAME_HEIGHT / 2) - (BALL_DIAMETER / 2), BALL_DIAMETER, BALL_DIAMETER);
@@ -48,7 +47,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     private void loadImage() {
-        String filePath = "C:/Users/jacka/OneDrive/Desktop/Pong/Main/images/br.jpg";
+        String filePath = "images/br.jpg";  // Relative path from the current working directory
         File file = new File(filePath);
         try {
             backgroundImage = ImageIO.read(file);
@@ -62,14 +61,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             System.err.println("Failed to load image from path: " + filePath);
         }
     }
-    
-    
-
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Draw the background image if it's loaded, otherwise draw a black background
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
         } else {
@@ -82,16 +77,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         player2.draw(g);
         ball.draw(g);
     }
-    
+
     public void scoreUpdate(int player) {
         if (player == 1) {
-            player1Score++;  // Correctly increment player1's score
+            player1Score++;
         } else if (player == 2) {
-            player2Score++;  // Correctly increment player2's score
+            player2Score++;
         }
         scoreSound.play(); // Play sound on scoring
     }
-    
 
     public void actionPerformed(ActionEvent e) {
         if (playState) {
@@ -106,30 +100,30 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void checkCollision() {
         // Ball bounces off top & bottom window edges
         if (ball.y <= 0 || ball.y >= GAME_HEIGHT - ball.height) {
-            ball.setYDirection(-ball.yVelocity);
+            ball.setYDirection(-1); // Reverse the vertical direction
         }
-
+    
         // Ball bounces off paddles
         if (ball.intersects(player1) || ball.intersects(player2)) {
-            ball.setXDirection(-ball.xVelocity);
+            ball.setXDirection(-1); // Reverse the horizontal direction
+            ball.increaseSpeed(); // Increase speed on hitting a paddle
         }
-
+    
         // Ball goes out of bounds
         if (ball.x <= 0) {
             scoreUpdate(2);
             playState = false;
             newPaddles();
             newBall();
-            ball.stop();
+            ball.resetSpeed(); // Reset speed when ball goes out of bounds
         } else if (ball.x >= GAME_WIDTH - ball.width) {
             scoreUpdate(1);
             playState = false;
             newPaddles();
             newBall();
-            ball.stop();
+            ball.resetSpeed(); // Reset speed when ball goes out of bounds
         }
     }
-
     public void newPaddles() {
         player1.y = (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2);
         player2.y = (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2);
@@ -138,10 +132,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void newBall() {
         ball.x = (GAME_WIDTH / 2) - (BALL_DIAMETER / 2);
         ball.y = (GAME_HEIGHT / 2) - (BALL_DIAMETER / 2);
+        ball.resetSpeed();  // Reset to initial speeds
     }
-
-
-
 
     private void drawScoreboard(Graphics g) {
         g.setColor(Color.WHITE);
@@ -163,8 +155,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         player2.keyPressed(e);
         if (e.getKeyCode() == KeyEvent.VK_SPACE && !playState) {
             playState = true;  // Start moving the ball again
-            int direction = (player1Score + player2Score) % 2 == 0 ? 1 : -1;
-            ball.start(direction);  // Serve the ball towards the last scorer
+            ball.start(1);  // Restart ball with initial speed
         }
     }
 

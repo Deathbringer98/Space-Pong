@@ -1,23 +1,16 @@
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-public class Ball extends Rectangle {
-    int xVelocity;
-    int yVelocity;
-    int initialSpeed = 2;
+public class Ball {
+    int x, y; // Position
+    int width = 20, height = 20; // Size
+    int xVelocity = 1, yVelocity = 1; // Velocity
 
-    Ball(int x, int y, int width, int height) {
-        super(x, y, width, height);
-        xVelocity = initialSpeed;
-        yVelocity = initialSpeed;
-    }
-
-    public void setXDirection(int xDirection) {
-        xVelocity = xDirection;
-    }
-
-    public void setYDirection(int yDirection) {
-        yVelocity = yDirection;
+    public Ball(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
 
     public void move() {
@@ -35,7 +28,29 @@ public class Ball extends Rectangle {
     }
 
     public void start(int direction) {
-        xVelocity = initialSpeed * direction;
-        yVelocity = initialSpeed;
+        xVelocity = direction;
+        yVelocity = direction;
+    }
+
+    public boolean intersects(Paddle paddle) {
+        return new Rectangle(x, y, width, height).intersects(new Rectangle(paddle.x, paddle.y, paddle.width, paddle.height));
+    }
+
+    public void setXDirection(int newDirection) {
+        xVelocity = newDirection * Math.abs(xVelocity);
+    }
+
+    public void setYDirection(int newDirection) {
+        yVelocity = newDirection * Math.abs(yVelocity);
+    }
+
+    public void increaseSpeed() {
+        xVelocity *= 1.1;
+        yVelocity *= 1.1;
+    }
+
+    public void resetSpeed() {
+        xVelocity = 1;
+        yVelocity = 1;
     }
 }
