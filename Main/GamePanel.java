@@ -38,7 +38,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         timer = new Timer(10, this);
         timer.start();
-        scoreSound = new SoundEffect("/sounds/score.wav"); // score.wav should be in the /sounds directory relative to the class files
+        scoreSound = new SoundEffect("/sounds/score.wav");
     }
     public void scoreUpdate(int player) {
         if (player == 1) {
