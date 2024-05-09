@@ -7,26 +7,39 @@ public class SoundEffect {
 
     public SoundEffect(String soundFileName) {
         try {
-            // Use URL (instead of File) to read from disk and JAR
-            URL url = this.getClass().getResource("/sounds/" + soundFileName);
-            // Set up an audio input stream piped from the sound file.
+            // Ensure the URL is correctly formed and the file exists
+            URL url = this.getClass().getResource("/sounds/score.wav");
+            if (url == null) {
+                throw new RuntimeException("Resource not found: score.wav");
+            }
+            
+
+
+            // Open an audio input stream from the URL
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
-            // Get a clip resource.
             clip = AudioSystem.getClip();
-            // Open audio clip and load samples from the audio input stream.
             clip.open(audioInputStream);
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+        } catch (UnsupportedAudioFileException e) {
+            System.err.println("Unsupported audio file: " + soundFileName);
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Error reading audio file: " + soundFileName);
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            System.err.println("Audio line unavailable: " + soundFileName);
             e.printStackTrace();
         }
     }
 
     public void play() {
-        if (clip == null) return;
-        // Stop the player if it is still running
+        if (clip == null) {
+            System.err.println("Audio clip not initialized");
+            return;
+        }
         if (clip.isRunning()) {
-            clip.stop();
+            clip.stop(); // Stop the player if it is still running
         }
         clip.setFramePosition(0); // rewind to the beginning
-        clip.start();     // Start playing
+        clip.start(); // Start playing
     }
 }
