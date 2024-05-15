@@ -100,29 +100,30 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void checkCollision() {
         // Ball bounces off top & bottom window edges
         if (ball.y <= 0 || ball.y >= GAME_HEIGHT - ball.height) {
-            ball.setYDirection(-1); // Reverse the vertical direction
+            ball.setYDirection(-ball.yVelocity); // Reverse the vertical direction using current velocity
         }
     
         // Ball bounces off paddles
         if (ball.intersects(player1) || ball.intersects(player2)) {
-            ball.setXDirection(-1); // Reverse the horizontal direction
+            ball.setXDirection(-ball.xVelocity); // Reverse the horizontal direction using current velocity
             ball.increaseSpeed(); // Increase speed on hitting a paddle
         }
     
         // Ball goes out of bounds
         if (ball.x <= 0) {
             scoreUpdate(2);
-            playState = false;
-            newPaddles();
-            newBall();
-            ball.resetSpeed(); // Reset speed when ball goes out of bounds
+            resetGame(); // Handle game reset
         } else if (ball.x >= GAME_WIDTH - ball.width) {
             scoreUpdate(1);
-            playState = false;
-            newPaddles();
-            newBall();
-            ball.resetSpeed(); // Reset speed when ball goes out of bounds
+            resetGame(); // Handle game reset
         }
+    }
+    
+    private void resetGame() {
+        playState = false;
+        newPaddles();
+        newBall();
+        ball.resetSpeed(); // Reset speed when ball goes out of bounds
     }
     public void newPaddles() {
         player1.y = (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2);

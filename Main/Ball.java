@@ -2,11 +2,11 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 public class Ball {
-    int x, y; // Position
-    int width = 20, height = 20; // Size
-    int xVelocity = 1, yVelocity = 1; // Velocity
+    double x, y; // Use double for position to handle fractional moves
+    int width = 20, height = 20;
+    double xVelocity = 10, yVelocity = 10; // Use double for velocity
 
-    public Ball(int x, int y, int width, int height) {
+    public Ball(double x, double y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -19,7 +19,7 @@ public class Ball {
     }
 
     public void draw(Graphics g) {
-        g.fillOval(x, y, width, height);
+        g.fillOval((int)x, (int)y, width, height); // Cast to int for drawing
     }
 
     public void stop() {
@@ -45,12 +45,12 @@ public class Ball {
     }
 
     public void increaseSpeed() {
-        xVelocity *= 1.1;
-        yVelocity *= 1.1;
+        xVelocity *= 2.1;
+        yVelocity *= 2.1;
     }
 
     public void resetSpeed() {
-        xVelocity = 1;
-        yVelocity = 1;
+        xVelocity = 10;
+        yVelocity = 10;
     }
 }
